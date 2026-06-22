@@ -1,0 +1,21 @@
+{
+  "name": "@that-yolanda/plugin-word-count",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./index.js",
+  "scripts": {
+    "build": "tsup index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@that-yolanda/yo-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "yo": {
+    "description": "中英文字数统计"
+  }
+}

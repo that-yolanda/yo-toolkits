@@ -1,0 +1,27 @@
+{
+  "name": "@that-yolanda/yo-toolkits",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "个人 CLI 工具集合 — 插件式 (bin: yo)",
+  "bin": {
+    "yo": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@that-yolanda/yo-core": "workspace:*",
+    "cac": "^6.7.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}

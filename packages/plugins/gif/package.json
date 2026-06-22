@@ -1,0 +1,21 @@
+{
+  "name": "@that-yolanda/plugin-gif",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./index.js",
+  "scripts": {
+    "build": "tsup index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@that-yolanda/yo-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "yo": {
+    "description": "视频转 GIF 动图"
+  }
+}

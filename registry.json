@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "repo": "that-yolanda/yo-toolkits",
+  "plugins": {
+    "gif": {
+      "name": "gif",
+      "version": "1.0.0",
+      "description": "视频转 GIF 动图",
+      "subdir": "packages/plugins/gif",
+      "deps": ["ffmpeg", "ffprobe"]
+    },
+    "word-count": {
+      "name": "word-count",
+      "version": "1.0.0",
+      "description": "中英文字数统计",
+      "subdir": "packages/plugins/word-count"
+    }
+  }
+}

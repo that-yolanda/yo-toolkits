@@ -1,0 +1,35 @@
+{
+  "name": "@that-yolanda/yo-core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "yo-toolkits 框架运行时:插件契约、Context、输出、spawn、配置、加载器",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "chalk": "^5.4.0",
+    "execa": "^9.5.2",
+    "jiti": "^2.4.2",
+    "tiged": "^2.12.7",
+    "which": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/which": "^3.0.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}

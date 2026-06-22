@@ -1,0 +1,26 @@
+{
+  "name": "yo-toolkits-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "个人 CLI 工具集合 — 插件式 monorepo",
+  "scripts": {
+    "dev": "tsx packages/cli/src/index.ts",
+    "build": "pnpm -r run build",
+    "build:core": "pnpm --filter @that-yolanda/yo-core build",
+    "build:cli": "pnpm --filter @that-yolanda/yo-toolkits build",
+    "typecheck": "pnpm -r run typecheck",
+    "clean": "pnpm -r exec rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
