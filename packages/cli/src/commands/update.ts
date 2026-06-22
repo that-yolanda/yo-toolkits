@@ -1,7 +1,7 @@
 import path from 'node:path';
 import os from 'node:os';
-import type { Context } from '@that-yolanda/yo-core';
-import { listLocal, fetchRemoteRegistry, fetchSubdir, addLocal } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
+import { listLocal, fetchRemoteRegistry, fetchSubdir, addLocal } from '../core/index.js';
 import { installDeps } from '../install.js';
 
 export function registerUpdate(ctx: Context): void {

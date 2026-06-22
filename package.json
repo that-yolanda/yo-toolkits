@@ -5,7 +5,7 @@
   "type": "module",
   "description": "个人 CLI 工具集合 — 插件式 monorepo",
   "scripts": {
-    "dev": "tsx packages/cli/src/index.ts",
+    "dev": "tsx packages/cli/src/bin.ts",
     "build": "pnpm -r run build",
     "build:core": "pnpm --filter @that-yolanda/yo-core build",
     "build:cli": "pnpm --filter @that-yolanda/yo-toolkits build",

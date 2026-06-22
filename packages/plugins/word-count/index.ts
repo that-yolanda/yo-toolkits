@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Command, Context } from '@that-yolanda/yo-core';
+import type { Command, Context } from '@that-yolanda/yo-toolkits';
 
 interface CountResult {
   source: string;

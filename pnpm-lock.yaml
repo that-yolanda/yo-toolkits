@@ -23,25 +23,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@that-yolanda/yo-core':
-        specifier: workspace:*
-        version: link:../core
-      cac:
-        specifier: ^6.7.14
-        version: 6.7.14
-    devDependencies:
-      '@types/node':
-        specifier: ^22.10.0
-        version: 22.20.0
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.1(jiti@2.7.0)(tsx@4.22.4)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-
-  packages/core:
-    dependencies:
       cac:
         specifier: ^6.7.14
         version: 6.7.14
@@ -76,9 +57,9 @@ importers:
 
   packages/plugins/gif:
     dependencies:
-      '@that-yolanda/yo-core':
+      '@that-yolanda/yo-toolkits':
         specifier: workspace:*
-        version: link:../../core
+        version: link:../../cli
     devDependencies:
       '@types/node':
         specifier: ^22.10.0
@@ -92,9 +73,9 @@ importers:
 
   packages/plugins/word-count:
     dependencies:
-      '@that-yolanda/yo-core':
+      '@that-yolanda/yo-toolkits':
         specifier: workspace:*
-        version: link:../../core
+        version: link:../../cli
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

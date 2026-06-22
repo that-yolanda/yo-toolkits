@@ -1,4 +1,4 @@
-import type { Spawner } from '@that-yolanda/yo-core';
+import type { Spawner } from './core/index.js';
 
 /** 在目标目录安装 npm 依赖(优先 pnpm,回退 npm)。静默执行,避免污染输出。 */
 export async function installDeps(spawn: Spawner, dir: string): Promise<void> {

@@ -1,5 +1,5 @@
-import type { Context } from '@that-yolanda/yo-core';
-import { listLocal } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
+import { listLocal } from '../core/index.js';
 
 export function registerList(ctx: Context): void {
   ctx.cli

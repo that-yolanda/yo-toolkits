@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@that-yolanda/yo-core": "workspace:*"
+    "@that-yolanda/yo-toolkits": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

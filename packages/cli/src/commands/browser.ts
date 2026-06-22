@@ -1,5 +1,5 @@
-import type { Context } from '@that-yolanda/yo-core';
-import { fetchRemoteRegistry, listLocal } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
+import { fetchRemoteRegistry, listLocal } from '../core/index.js';
 
 export function registerBrowser(ctx: Context): void {
   ctx.cli

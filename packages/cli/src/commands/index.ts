@@ -1,4 +1,4 @@
-import type { Context } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
 import { registerVersion } from './version.js';
 import { registerList } from './list.js';
 import { registerBrowser } from './browser.js';

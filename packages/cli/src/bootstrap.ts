@@ -1,5 +1,5 @@
-import type { Context } from '@that-yolanda/yo-core';
-import { createContext, loadPlugins, YoError } from '@that-yolanda/yo-core';
+import type { Context } from './core/index.js';
+import { createContext, loadPlugins, YoError } from './core/index.js';
 import { registerManagementCommands } from './commands/index.js';
 
 /**

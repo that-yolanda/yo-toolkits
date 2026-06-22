@@ -1,8 +1,8 @@
 import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
-import type { Context } from '@that-yolanda/yo-core';
-import { removeLocal } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
+import { removeLocal } from '../core/index.js';
 
 export function registerRemove(ctx: Context): void {
   ctx.cli

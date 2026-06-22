@@ -1,4 +1,4 @@
-import type { Context } from '@that-yolanda/yo-core';
+import type { Context } from '../core/index.js';
 import pkg from '../../package.json';
 
 export function registerVersion(ctx: Context): void {

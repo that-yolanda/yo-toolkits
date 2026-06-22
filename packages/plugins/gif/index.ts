@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import type { Command, Context } from '@that-yolanda/yo-core';
+import type { Command, Context } from '@that-yolanda/yo-toolkits';
 
 interface QualityConfig {
   fps: number;
