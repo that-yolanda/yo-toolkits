@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { createJiti } from 'jiti';
+import { dataDir } from './paths.js';
 import type { Command, LoadedPlugin } from './types.js';
 import { listLocal } from './registry.js';
 
@@ -54,11 +54,11 @@ async function loadWorkspace(root: string): Promise<LoadedPlugin[]> {
   return results;
 }
 
-/** prod 模式:加载 ~/.yo/store/* 下已安装插件 */
+/** prod 模式:加载 XDG 数据目录 store/* 下已安装插件 */
 async function loadStore(): Promise<LoadedPlugin[]> {
   const results: LoadedPlugin[] = [];
   for (const entry of listLocal()) {
-    const absPath = path.join(os.homedir(), '.yo', 'store', entry.name, 'index.ts');
+    const absPath = path.join(dataDir(), 'store', entry.name, 'index.ts');
     if (!fs.existsSync(absPath)) continue;
     try {
       const plugin = await loadFromEntry(absPath);
