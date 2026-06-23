@@ -67,6 +67,38 @@ function buildHelpSections(ctx: Context): Array<{ title?: string; body: string }
   return sections;
 }
 
+/** 子命令 --help:命令描述作首行 + Usage 含必填参数 + Options */
+function buildCommandHelp(cmd: unknown): Array<{ title?: string; body: string }> {
+  const c = cmd as {
+    description?: string;
+    rawName: string;
+    options?: Array<{ rawName: string; description: string; required?: boolean }>;
+  };
+  const sections: Array<{ title?: string; body: string }> = [];
+
+  if (c.description) sections.push({ body: c.description });
+
+  const opts = c.options ?? [];
+  // 必填:带 <required> 值的 option(cac 解析 <x> 为 required)
+  const reqPart = opts
+    .filter((o) => o.required)
+    .map((o) => {
+      const short = o.rawName.split(',')[0].trim(); // '-i'
+      const arg = o.rawName.match(/<[^\s>]+>/)?.[0] ?? ''; // '<file>'
+      return `${short} ${arg}`.trim();
+    })
+    .join(' ');
+  sections.push({ title: 'Usage', body: `  $ yo ${c.rawName}${reqPart ? ' ' + reqPart : ''}` });
+
+  const all = [...opts, { rawName: '-h, --help', description: '显示帮助' }];
+  const w = all.reduce((m, o) => Math.max(m, o.rawName.length), 0);
+  sections.push({
+    title: 'Options',
+    body: all.map((o) => `  ${o.rawName.padEnd(w + 2)}${o.description}`).join('\n'),
+  });
+  return sections;
+}
+
 /**
  * CLI 装配入口:
  * 1. 构造 Context(按 -f/--format 决定输出模式,默认 json)
@@ -80,7 +112,9 @@ export async function bootstrap(argv: string[]): Promise<void> {
   const ctx = createContext({ format });
   // 自定义 help(分组 + 去 "For more info");callback 延迟执行,届时插件已加载
   // 全局 --help 自定义分组;子命令 --help 用 cac 默认(该命令自身 options)
-  ctx.cli.help((sections) => (ctx.cli.matchedCommand ? sections : buildHelpSections(ctx)));
+  ctx.cli.help(() =>
+    ctx.cli.matchedCommand ? buildCommandHelp(ctx.cli.matchedCommand) : buildHelpSections(ctx),
+  );
 
   // 兜底 async action 内抛出的错误(统一渲染为 error)
   process.on('unhandledRejection', (err) => handleError(err, ctx));

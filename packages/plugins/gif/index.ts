@@ -30,8 +30,8 @@ export default {
     ctx.cli
       .command('gif', '视频转 GIF 动图')
       .option('-i, --input <file>', '输入视频文件路径(必填)')
-      .option('-o, --output <file>', '输出 GIF 路径(默认与输入同目录同名)')
-      .option('-q, --quality <level>', '清晰度 h/m/l(默认 h)', { default: 'h' })
+      .option('-o, --output [file]', '输出 GIF 路径(默认与输入同目录同名)')
+      .option('-q, --quality [level]', '清晰度 h/m/l(默认 h)', { default: 'h' })
       .action(
         async (options: { input?: string; output?: string; quality?: string }) => {
           const input = options.input;
