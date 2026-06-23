@@ -79,7 +79,8 @@ export async function bootstrap(argv: string[]): Promise<void> {
 
   const ctx = createContext({ format });
   // 自定义 help(分组 + 去 "For more info");callback 延迟执行,届时插件已加载
-  ctx.cli.help(() => buildHelpSections(ctx));
+  // 全局 --help 自定义分组;子命令 --help 用 cac 默认(该命令自身 options)
+  ctx.cli.help((sections) => (ctx.cli.matchedCommand ? sections : buildHelpSections(ctx)));
 
   // 兜底 async action 内抛出的错误(统一渲染为 error)
   process.on('unhandledRejection', (err) => handleError(err, ctx));
