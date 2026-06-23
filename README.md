@@ -1,30 +1,30 @@
 # yo-toolkits
 
-> 个人 CLI 工具集合 — 插件式 monorepo。`yo` 是统一入口,具体工具以插件形式按需安装。
+> 个人 CLI 工具集合 —— 插件式架构。`yo` 是统一入口,具体工具以插件形式按需安装。
 
 ## 特性
 
-- **插件式**:核心只管路由与管理(`add / remove / list / browser / update`),工具独立成插件
-- **按需安装**:`yo add gif` 从 GitHub 拉取,之后 `yo gif ...` 直接用
+- **插件式**:核心只管路由与管理(`add / remove / list / browser / update / version`),工具独立成插件
+- **按需安装**:`yo add gif` 从 GitHub 拉取源码,之后 `yo gif ...` 直接用
 - **依赖隔离**:每个插件独立 npm 依赖,不污染全局
-- **双模式输出**:默认彩色人类可读,`--json` 输出 `{ok,data,error}` 供 agent / 脚本消费
-- **TypeScript + ESM + pnpm workspace**
+- **双模式输出**:默认机器可读 JSON,`-f text` 切彩色人类可读
+- **TypeScript + ESM + pnpm workspace**,源码分发、改完 push 即生效
 
 ## 安装
 
-> 第一版尚未发布到 npm。本地开发:
-
-```bash
-pnpm install
-pnpm dev -- --help
-```
-
-后续发布到 npm 后:
-
 ```bash
 npm i -g @that-yolanda/yo-toolkits
-yo add gif            # 安装插件
-yo gif -i video.mp4   # 直接使用
+```
+
+要求:Node ≥ 18。
+
+## 快速开始
+
+```bash
+yo add gif              # 从 GitHub 安装 gif 插件
+yo gif -i video.mp4     # 直接使用
+yo list                 # 查看已安装插件
+yo browser              # 浏览所有可用插件
 ```
 
 ## 命令
@@ -33,48 +33,66 @@ yo gif -i video.mp4   # 直接使用
 
 | 命令 | 说明 |
 |---|---|
-| `yo add <name>` | 从 GitHub 安装插件 |
-| `yo remove <name>` | 删除已安装插件 |
-| `yo list` | 列出本地已安装插件 |
-| `yo browser` | 浏览 GitHub 上可用插件 |
+| `yo add <name>` | 从 GitHub 安装一个插件 |
+| `yo remove <name>` | 删除已安装插件(别名 `rm`) |
+| `yo list` | 列出本地已安装插件(别名 `ls`) |
+| `yo browser` | 浏览 GitHub 上所有可用插件 |
 | `yo update [name]` | 升级插件(省略 name 升级全部) |
-| `yo version` | 显示版本 |
-| `yo --help` | 帮助 |
+| `yo version` | 显示 yo 版本 |
+| `yo --help` / `yo <cmd> --help` | 帮助 |
 
-### 内置插件(第一版)
+### 内置插件
 
-- **gif** — 视频转 GIF(`yo gif -i video.mp4 -q m`)
-- **word-count** — 中英文字数统计(`yo word-count -t "你好 world"`)
+- **gif** —— 视频转 GIF 动图(`yo gif -i video.mp4 -q m`)
+- **word-count** —— 中英文字数统计(`yo word-count -t "你好 world"`)
 
 > tts / stt / wiki / content-audio / live-translate / zed-to-ghostty 后续分批迁移。
 
 ## 全局选项
 
-`--json` — 切换为机器可读 JSON 输出,例如 `yo --json word-count -t "你好"`。
+`-f, --format <json|text>` —— 输出格式,**默认 `json`**。
 
-成功:
+- `json`(默认):机器可读,供 agent / 脚本消费
+- `text`:彩色人类可读
 
-```json
-{ "ok": true, "data": { "chinese": 1, "english": 1, "total": 2 }, "error": null }
+```bash
+yo word-count -t "你好 world"            # 默认 json
+yo -f text word-count -t "你好 world"    # 彩色输出
 ```
 
-失败:
+**成功(JSON)**:
 
 ```json
 {
-  "ok": false, "data": null,
-  "error": { "code": "DEPENDENCY_MISSING", "message": "缺少外部依赖: ffmpeg", "suggestion": "请先安装: brew install ffmpeg" }
+  "ok": true,
+  "data": { "chinese": 2, "english": 1, "total": 3 },
+  "error": null
 }
 ```
 
-## 目录结构
+**失败(JSON)**:
 
+```json
+{
+  "ok": false,
+  "data": null,
+  "error": {
+    "code": "DEPENDENCY_MISSING",
+    "message": "缺少外部依赖: ffmpeg",
+    "suggestion": "请先安装: brew install ffmpeg"
+  }
+}
 ```
-packages/
-├── core/     @that-yolanda/yo-core      框架运行时(契约 / Context / 加载器 / registry)
-├── cli/      @that-yolanda/yo-toolkits  bin: yo(管理命令 + 路由)
-└── plugins/  @that-yolanda/plugin-*     各工具插件(简单插件单文件 index.ts)
-```
+
+## 数据目录(XDG)
+
+| 用途 | macOS / Linux | Windows |
+|---|---|---|
+| 配置 | `~/.config/yo/config.json` | `%APPDATA%\yo\config.json` |
+| 已装插件 | `~/.local/share/yo/store/` | `%LOCALAPPDATA%\yo\store\` |
+| 临时文件 | `~/.cache/yo/tmp/` | `%LOCALAPPDATA%\yo\tmp\` |
+
+支持 `XDG_CONFIG_HOME` / `XDG_DATA_HOME` / `XDG_CACHE_HOME` 环境变量覆盖。
 
 ## 开发
 
@@ -85,6 +103,4 @@ pnpm dev word-count -t "你好 world"
 pnpm typecheck
 ```
 
-开发规范与「如何新增一个命令」见 [CLAUDE.md](./CLAUDE.md)。
-
-数据目录:`~/.yo/`(`store/` 已装插件、`config.json`、`tmp/`)。
+开发规范、如何新增插件、字段唯一来源等约定见 [CLAUDE.md](./CLAUDE.md)。

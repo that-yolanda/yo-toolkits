@@ -5,10 +5,16 @@ import type { CAC } from 'cac';
  * register() 内用 ctx.cli 注册子命令,用 ctx.* 调用框架能力。
  */
 export interface Command {
-  /** 插件名,即子命令名(如 wiki / gif) */
+  /** 插件名,即子命令名(如 wiki / gif);同时作 registry key 与 loader 去重依据 */
   name: string;
+  /** 版本号;registry.json / list / browser 展示的唯一来源 */
   version: string;
+  /** 一句话描述;子命令 help 首行 + registry / list / browser 展示 */
   description: string;
+  /** 外部系统依赖(如 ffmpeg / rg);生成 registry.json 的 deps,运行时由 ctx.spawn.assertDeps 检查 */
+  deps?: string[];
+  /** 所需环境变量 / 配置项(如 WIKI_DIR);生成 registry.json 的 env,供 config.env.example 参考 */
+  env?: string[];
   register(ctx: Context): void | Promise<void>;
 }
 

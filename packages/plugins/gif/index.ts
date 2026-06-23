@@ -22,13 +22,14 @@ const QUALITY: Record<string, QualityConfig> = {
 // 带透明通道的像素格式前缀,需先合成白底
 const TRANSPARENT_PREFIXES = ['yuva', 'gbrap', 'rgba', 'argb', 'pal8'];
 
-export default {
+const cmd = {
   name: 'gif',
   version: '1.0.0',
   description: '视频转 GIF 动图',
+  deps: ['ffmpeg', 'ffprobe'],
   register(ctx: Context) {
     ctx.cli
-      .command('gif', '视频转 GIF 动图')
+      .command(cmd.name, cmd.description)
       .usage('gif -i <file>')
       .option('-i, --input <file>', '输入视频文件路径(必填)')
       .option('-o, --output <file>', '输出 GIF 路径(默认与输入同目录同名)')
@@ -51,7 +52,7 @@ export default {
           }
           const cfg = QUALITY[quality];
 
-          ctx.spawn.assertDeps(['ffmpeg', 'ffprobe']);
+          ctx.spawn.assertDeps(cmd.deps);
 
           const inputDir = path.dirname(absInput);
           const filestem = path.basename(absInput, path.extname(absInput));
@@ -139,3 +140,5 @@ export default {
       );
   },
 } satisfies Command;
+
+export default cmd;

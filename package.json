@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "tsx packages/cli/src/bin.ts",
     "build": "pnpm -r run build",
-    "build:core": "pnpm --filter @that-yolanda/yo-core build",
     "build:cli": "pnpm --filter @that-yolanda/yo-toolkits build",
     "typecheck": "pnpm -r run typecheck",
+    "gen:registry": "tsx scripts/gen-registry.ts",
+    "check:registry": "tsx scripts/gen-registry.ts --check",
     "clean": "pnpm -r exec rm -rf dist"
   },
   "devDependencies": {

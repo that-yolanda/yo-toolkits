@@ -61,13 +61,13 @@ function gatherInput(options: { file?: string; text?: string }, ctx: Context): I
   );
 }
 
-export default {
+const cmd = {
   name: 'word-count',
   version: '1.0.0',
   description: '中英文字数统计',
   register(ctx: Context) {
     ctx.cli
-      .command('word-count', '中英文字数统计')
+      .command(cmd.name, cmd.description)
       .usage('word-count -f <path> | -t <string>')
       .option('-f, --file <path>', '按文件统计')
       .option('-t, --text <string>', '按字符串统计')
@@ -96,3 +96,5 @@ export default {
       });
   },
 } satisfies Command;
+
+export default cmd;

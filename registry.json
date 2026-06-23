@@ -7,7 +7,10 @@
       "version": "1.0.0",
       "description": "视频转 GIF 动图",
       "subdir": "packages/plugins/gif",
-      "deps": ["ffmpeg", "ffprobe"]
+      "deps": [
+        "ffmpeg",
+        "ffprobe"
+      ]
     },
     "word-count": {
       "name": "word-count",
