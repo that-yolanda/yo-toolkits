@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { dataDir } from './paths.js';
+import { rootDir } from './paths.js';
 import type { RegistryFile, LocalRegistryFile, LocalEntry, RegistryEntry } from './types.js';
 import { YoError } from './types.js';
 
 export const DEFAULT_REPO = 'that-yolanda/yo-toolkits';
 export const DEFAULT_REF = 'main';
 
-export const LOCAL_DIR = dataDir();
+export const LOCAL_DIR = rootDir();
 export const LOCAL_REGISTRY_PATH = path.join(LOCAL_DIR, 'registry.local.json');
 
 export function remoteRegistryUrl(repo: string = DEFAULT_REPO, ref: string = DEFAULT_REF): string {

@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { configDir } from './paths.js';
+import { rootDir } from './paths.js';
 import type { Config } from './types.js';
 
-const CONFIG_DIR = configDir();
+const CONFIG_DIR = rootDir();
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 
-/** 配置读写:优先 process.env(兼容旧脚本),再 XDG config 目录下的 config.json */
+/** 配置读写:优先 process.env(兼容旧脚本),再根目录下的 config.json */
 export class FileConfig implements Config {
   private cache: Record<string, string> | null = null;
 

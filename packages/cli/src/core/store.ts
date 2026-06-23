@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { cacheDir, dataDir } from './paths.js';
+import { rootDir } from './paths.js';
 import type { Store } from './types.js';
 
-const STORE = path.join(dataDir(), 'store');
-const TMP = path.join(cacheDir(), 'tmp');
+const STORE = path.join(rootDir(), 'store');
+const TMP = path.join(rootDir(), 'tmp');
 
-/** 插件数据 / 临时目录管理 */
+/** 插件数据 / 临时目录管理(均在统一根下) */
 export class FileSystemStore implements Store {
   dataDir(...segments: string[]): string {
     return path.join(STORE, ...segments);

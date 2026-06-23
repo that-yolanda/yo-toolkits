@@ -84,15 +84,22 @@ yo -f text word-count -t "你好 world"    # 彩色输出
 }
 ```
 
-## 数据目录(XDG)
+## 数据目录
 
-| 用途 | macOS / Linux | Windows |
-|---|---|---|
-| 配置 | `~/.config/yo/config.json` | `%APPDATA%\yo\config.json` |
-| 已装插件 | `~/.local/share/yo/store/` | `%LOCALAPPDATA%\yo\store\` |
-| 临时文件 | `~/.cache/yo/tmp/` | `%LOCALAPPDATA%\yo\tmp\` |
+所有数据(配置 / 插件 / 已装记录 / 临时)统一归口到单一根目录,便于查找与备份:
 
-支持 `XDG_CONFIG_HOME` / `XDG_DATA_HOME` / `XDG_CACHE_HOME` 环境变量覆盖。
+| macOS / Linux | Windows |
+|---|---|
+| `~/.local/share/yo/` | `%LOCALAPPDATA%\yo\` |
+
+根目录下:
+
+- `config.json` — yo 配置
+- `store/<name>/` — 已安装插件
+- `registry.local.json` — 已装记录
+- `tmp/` — 临时文件
+
+macOS / Linux 支持 `XDG_DATA_HOME` 环境变量覆盖根目录。该根与 yolanda-skills 的 `YO_CONFIG_HOME` 默认值一致(配置共享同一目录)。
 
 ## 开发
 

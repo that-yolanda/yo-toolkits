@@ -69,8 +69,8 @@ export default cmd;
 | `ctx.spawn.assertDeps([...])` | 批量检查系统依赖,缺失抛 `DEPENDENCY_MISSING`(带安装建议) |
 | `ctx.config.get(key, fallback?)` | 读配置(优先 `process.env`,再 XDG config) |
 | `ctx.config.set(key, value)` | 写 XDG config |
-| `ctx.store.dataDir(...segs)` | 插件数据目录 `<data>/store/<plugin>/...` |
-| `ctx.store.tmpDir(...segs)` | 临时目录 `<cache>/tmp/...` |
+| `ctx.store.dataDir(...segs)` | 插件数据目录 `<root>/store/<plugin>/...` |
+| `ctx.store.tmpDir(...segs)` | 临时目录 `<root>/tmp/...` |
 | `ctx.store.ensureDir(dir)` | 确保目录存在(recursive) |
 | `ctx.cwd` | 当前工作目录,用于 `path.resolve` 相对路径 |
 
@@ -82,17 +82,19 @@ export default cmd;
 
 ## 加载与分发机制
 
+> **统一根**:所有 yo 数据(`config.json` / `store` / `registry.local.json` / `tmp`)归口于 `~/.local/share/yo`(Windows `%LOCALAPPDATA%\yo`),与 yolanda-skills 的 `YO_CONFIG_HOME` 默认值一致。下文 `<root>` 即指此目录。macOS/Linux 读 `XDG_DATA_HOME` 覆盖。
+
 ### 加载(loader)
 
 - **dev 模式**(当前目录位于 monorepo 内):扫 `packages/plugins/*/index.ts`
-- **prod 模式**:读本地 registry,加载 `<data>/store/<name>/index.ts`
+- **prod 模式**:读本地 registry,加载 `<root>/store/<name>/index.ts`
 - 同名插件 **dev 优先**,便于改源码即时调试
 - TS 源码由 jiti 运行时转译,**无需预编译插件**
 
 ### 分发(`yo add <name>`)
 
 1. 拉远程 `registry.json`,取条目
-2. `git clone --depth 1` 浅克隆仓库,提取 `<subdir>` 到 `<data>/store/<name>/`(借鉴 vercel-labs/skills,零额外依赖,不引入 deprecated 包)
+2. `git clone --depth 1` 浅克隆仓库,提取 `<subdir>` 到 `<root>/store/<name>/`(借鉴 vercel-labs/skills,零额外依赖,不引入 deprecated 包)
 3. 在该目录 `pnpm install --prod` 装依赖(含 `@that-yolanda/yo-toolkits`)
 4. `assertDeps(deps)` 检查系统依赖(ffmpeg 等)
 5. 登记到本地 registry
@@ -108,7 +110,7 @@ export default cmd;
    - `version` 不必手写准确,会被 `gen:registry` 从 index.ts 同步
 3. `pnpm install` 链接 workspace → `pnpm dev <name> -h` 验证
 4. **生成 registry**:`pnpm gen:registry`(从所有插件 index.ts 派生 `registry.json` + 同步各 package.json version)
-5. push 到 GitHub 后,`yo add <name>` 即可被安装到 `<data>/store/<name>/`
+5. push 到 GitHub 后,`yo add <name>` 即可被安装到 `<root>/store/<name>/`
 
 > `registry.json` 是**派生物**,不要手改。CI 用 `pnpm check:registry` 防漂移。
 
