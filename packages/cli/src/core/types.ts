@@ -1,4 +1,5 @@
 import type { CAC } from 'cac';
+import type { HelpSpec } from './help.js';
 
 /**
  * 插件契约:每个插件 default export 一个此对象。
@@ -34,6 +35,8 @@ export interface Context {
   store: Store;
   /** 当前工作目录 */
   cwd: string;
+  /** 渲染标准帮助(插件覆写 command.outputHelp 时用;走 ctx 而非 import 框架,保证 store 加载零依赖) */
+  renderHelp(spec: HelpSpec): string;
 }
 
 export interface Output {

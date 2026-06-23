@@ -6,6 +6,7 @@ import { ConsoleOutput } from './output.js';
 import { ProcessSpawner } from './spawn.js';
 import { FileConfig } from './config.js';
 import { FileSystemStore } from './store.js';
+import { renderHelp } from './help.js';
 
 export interface CreateContextOptions {
   /** 输出格式,默认 'json' */
@@ -26,5 +27,6 @@ export function createContext(opts: CreateContextOptions = {}): Context {
     config: new FileConfig(),
     store: new FileSystemStore(),
     cwd: opts.cwd ?? process.cwd(),
+    renderHelp,
   };
 }

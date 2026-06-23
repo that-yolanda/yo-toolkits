@@ -32,7 +32,6 @@ packages/
 每个插件 `default export` 一个 `Command`。**用 `const cmd = {...}; export default cmd` 写法**,register 内复用 `cmd.name` / `cmd.description` / `cmd.deps`,保证字段只写一次:
 
 ```ts
-import { renderHelp } from '@that-yolanda/yo-toolkits';
 import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 const myCmdSpec: HelpSpec = {
@@ -57,9 +56,9 @@ const cmd = {
         const r = await ctx.spawn.run('ffmpeg', [...]);
         ctx.output.success({ result: r.stdout }, '完成');
       });
-    // 覆写 outputHelp,用框架 renderHelp 统一渲染(见"帮助规范")
+    // 覆写 outputHelp,用 ctx.renderHelp 统一渲染(见"帮助规范")
     (c as { outputHelp: () => void }).outputHelp = () =>
-      process.stdout.write(renderHelp(myCmdSpec) + '\n');
+      process.stdout.write(ctx.renderHelp(myCmdSpec) + '\n');
   },
 } satisfies Command;
 
@@ -83,6 +82,7 @@ export default cmd;
 | `ctx.store.tmpDir(...segs)` | 临时目录 `<root>/tmp/...` |
 | `ctx.store.ensureDir(dir)` | 确保目录存在(recursive) |
 | `ctx.cwd` | 当前工作目录,用于 `path.resolve` 相对路径 |
+| `ctx.renderHelp(spec)` | 渲染标准帮助文本(覆写 command.outputHelp 时用) |
 
 ### 输出规范
 
@@ -92,7 +92,7 @@ export default cmd;
 
 ### 帮助规范
 
-所有插件覆写 `command.outputHelp = () => renderHelp(spec)`,统一帮助格式(框架自动追加通用 `-f`/`-h`):
+所有插件覆写 `command.outputHelp = () => ctx.renderHelp(spec)`,统一帮助格式(框架自动追加通用 `-f`/`-h`):
 
 ```ts
 const spec: HelpSpec = {
@@ -105,6 +105,8 @@ const spec: HelpSpec = {
 ```
 
 > cac 的命令匹配只比对 `args[0]`(单字),多词命令名(如 `wiki search`)无法匹配,且 `.usage()` 会叠加 bin 名 → `yo yo wiki`。所以**不要**用 cac 的 `.usage()` 或多词子命令;有子命令时注册单命令 + `allowUnknownOptions` + action 内手动路由(见 `packages/plugins/wiki`)。业务选项短名**避开 `-f`**(全局 format 占用,会被 bootstrap 拦截)。
+
+> **运行时零框架依赖**:插件只允许 `import type { ... }` 自 `@that-yolanda/yo-toolkits`(类型契约,jiti 擦除),**禁止 `import { 值 }`**。框架运行时能力(`renderHelp` / `output` / `spawn` / ...)一律走 `ctx`。store 里的插件不装框架包(`workspace:*` 在 store 解析不了),值 import 会触发加载 `Cannot find module`。
 
 ## 加载与分发机制
 

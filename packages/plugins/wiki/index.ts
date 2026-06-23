@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { renderHelp } from '@that-yolanda/yo-toolkits';
 import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 // ── 枚举与类型 ──
@@ -324,8 +323,8 @@ const updateSpec: HelpSpec = {
   env: WIKI_ENV,
 };
 
-function formatHelp(sub: string | undefined): string {
-  return renderHelp(
+function formatHelp(ctx: Context, sub: string | undefined): string {
+  return ctx.renderHelp(
     sub === 'search' ? searchSpec
       : sub === 'add' ? addSpec
       : sub === 'update' ? updateSpec
@@ -348,7 +347,7 @@ const cmd = {
     (wikiCmd as { outputHelp: () => void }).outputHelp = () => {
       const idx = process.argv.indexOf('wiki');
       const sub = idx >= 0 ? process.argv[idx + 1] : undefined;
-      process.stdout.write(formatHelp(sub) + '\n');
+      process.stdout.write(formatHelp(ctx, sub) + '\n');
     };
     wikiCmd.action(() => {
       const idx = process.argv.indexOf('wiki');
@@ -360,7 +359,7 @@ const cmd = {
         case 'add': return runAdd(ctx, subArgv);
         case 'update': return runUpdate(ctx, subArgv);
         case undefined: case '-h': case '--help':
-          process.stdout.write(formatHelp(undefined) + '\n');
+          process.stdout.write(formatHelp(ctx, undefined) + '\n');
           return;
         default:
           ctx.output.fail('INVALID_ARGS', `未知子命令: ${sub}`, '用法: yo wiki search|add|update');

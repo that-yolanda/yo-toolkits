@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { renderHelp } from '@that-yolanda/yo-toolkits';
 import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 interface CountResult {
@@ -104,7 +103,7 @@ const cmd = {
         console.log(`合计字数:${result.total}`);
       });
     (c as { outputHelp: () => void }).outputHelp = () => {
-      process.stdout.write(renderHelp(wordCountSpec) + '\n');
+      process.stdout.write(ctx.renderHelp(wordCountSpec) + '\n');
     };
   },
 } satisfies Command;

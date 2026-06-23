@@ -1,6 +1,5 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { renderHelp } from '@that-yolanda/yo-toolkits';
 import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 interface QualityConfig {
@@ -149,7 +148,7 @@ const cmd = {
         },
       );
     (c as { outputHelp: () => void }).outputHelp = () => {
-      process.stdout.write(renderHelp(gifSpec) + '\n');
+      process.stdout.write(ctx.renderHelp(gifSpec) + '\n');
     };
   },
 } satisfies Command;
