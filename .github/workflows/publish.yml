@@ -1,0 +1,46 @@
+name: publish
+
+# 发布 @that-yolanda/yo-toolkits 到 npm。
+# 用 npm trusted publishing(OIDC),无需 NPM_TOKEN —— 已在 npm 包设置里
+# 绑定本仓库 + 本 workflow 文件名(publish.yml)。
+#
+# 触发:手动(workflow_dispatch),或 packages/cli(toolkits 源码)改动 push 到 main。
+# 注意:packages/plugins/** 的改动不触发本 workflow —— 插件走 degit 源码分发,无需发 npm。
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/cli/**'
+      - 'package.json'
+      - 'tsconfig.base.json'
+      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+  id-token: write # OIDC trusted publishing 必需
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4 # 自动读取 root 的 packageManager 字段
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm --filter @that-yolanda/yo-toolkits run build
+
+      - name: Publish (OIDC, no token)
+        working-directory: packages/cli
+        run: npm publish --access public --provenance

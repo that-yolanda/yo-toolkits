@@ -1,6 +1,6 @@
 {
   "name": "@that-yolanda/yo-toolkits",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "个人 CLI 工具集合 — 插件式 (bin: yo + 框架运行时)",
   "main": "./dist/index.js",
@@ -26,7 +26,6 @@
     "chalk": "^5.4.0",
     "execa": "^9.5.2",
     "jiti": "^2.4.2",
-    "tiged": "^2.12.7",
     "which": "^5.0.0"
   },
   "devDependencies": {

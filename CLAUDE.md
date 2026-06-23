@@ -99,6 +99,14 @@ export default {
 - scope 统一 `@that-yolanda/*`
 - 插件命令名用小写连字符(如 `word-count`),与 `name` 字段一致
 
+## 版本号策略
+
+- **patch**(`0.0.X`,默认):bug 修复、小改动、文档 —— 每次修改自动 +1
+- **minor**(`0.X.0`):新功能、行为变化、非破坏性增强 —— **需用户确认**
+- **major**(`X.0.0`):破坏性 API 变更 —— **需用户确认**
+
+判定优先级:能用 patch 解决的不上 minor。拿不准就按 patch 走,review 时由用户升级。
+
 ## 常用脚本
 
 ```bash

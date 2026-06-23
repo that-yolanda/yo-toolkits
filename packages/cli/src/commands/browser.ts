@@ -11,7 +11,7 @@ export function registerBrowser(ctx: Context): void {
       const entries = Object.values(registry.plugins);
       const data = entries.map((e) => ({ ...e, installed: installed.has(e.name) }));
 
-      if (ctx.output.isJson) {
+      if (ctx.output.format === 'json') {
         ctx.output.success({ repo: registry.repo, plugins: data });
         return;
       }

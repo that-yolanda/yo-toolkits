@@ -31,8 +31,8 @@ export interface Context {
 }
 
 export interface Output {
-  /** 是否 --json 模式 */
-  isJson: boolean;
+  /** 输出格式:json(默认,机器可读) 或 text(彩色人类可读) */
+  format: 'json' | 'text';
   /** 成功输出 */
   success(data: unknown, message?: string): void;
   /** 失败输出并退出(退出码 1) */

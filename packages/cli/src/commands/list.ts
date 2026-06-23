@@ -14,7 +14,7 @@ export function registerList(ctx: Context): void {
         installedAt: p.installedAt,
       }));
 
-      if (ctx.output.isJson) {
+      if (ctx.output.format === 'json') {
         ctx.output.success({ plugins: data });
         return;
       }

@@ -1,11 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
+import { cacheDir, dataDir } from './paths.js';
 import type { Store } from './types.js';
 
-const BASE = path.join(os.homedir(), '.yo');
-const STORE = path.join(BASE, 'store');
-const TMP = path.join(BASE, 'tmp');
+const STORE = path.join(dataDir(), 'store');
+const TMP = path.join(cacheDir(), 'tmp');
 
 /** 插件数据 / 临时目录管理 */
 export class FileSystemStore implements Store {

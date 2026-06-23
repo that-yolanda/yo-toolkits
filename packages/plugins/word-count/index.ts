@@ -81,7 +81,7 @@ export default {
           total: chinese + english,
         };
 
-        if (ctx.output.isJson) {
+        if (ctx.output.format === 'json') {
           ctx.output.success(result);
           return;
         }

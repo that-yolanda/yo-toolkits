@@ -8,7 +8,8 @@ import { FileConfig } from './config.js';
 import { FileSystemStore } from './store.js';
 
 export interface CreateContextOptions {
-  isJson?: boolean;
+  /** 输出格式,默认 'json' */
+  format?: 'json' | 'text';
   cwd?: string;
   /** 注入自定义 cac 实例(测试用) */
   cli?: CAC;
@@ -19,7 +20,7 @@ export function createContext(opts: CreateContextOptions = {}): Context {
   const log = new ConsoleLogger();
   return {
     cli: opts.cli ?? cac('yo'),
-    output: new ConsoleOutput(opts.isJson),
+    output: new ConsoleOutput(opts.format ?? 'json'),
     log,
     spawn: new ProcessSpawner(log),
     config: new FileConfig(),
