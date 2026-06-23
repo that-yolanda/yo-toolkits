@@ -3,6 +3,11 @@
   "version": "0.2.1",
   "type": "module",
   "description": "个人 CLI 工具集合 — 插件式 (bin: yo + 框架运行时)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/that-yolanda/yo-toolkits.git",
+    "directory": "packages/cli"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
