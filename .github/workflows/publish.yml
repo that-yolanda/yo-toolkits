@@ -35,6 +35,10 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      # npm trusted publishing(OIDC)需要 npm >= 11.5.1,node 22 自带 npm 10,需升级
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
       - name: Install
         run: pnpm install --frozen-lockfile
 
