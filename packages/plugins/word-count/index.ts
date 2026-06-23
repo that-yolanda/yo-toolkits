@@ -68,6 +68,7 @@ export default {
   register(ctx: Context) {
     ctx.cli
       .command('word-count', '中英文字数统计')
+      .usage('word-count -f <path> | -t <string>')
       .option('-f, --file <path>', '按文件统计')
       .option('-t, --text <string>', '按字符串统计')
       .action((options: { file?: string; text?: string }) => {
