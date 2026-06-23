@@ -12,6 +12,15 @@
         "ffprobe"
       ]
     },
+    "wiki": {
+      "name": "wiki",
+      "version": "1.0.0",
+      "description": "本地知识库管理(搜索/添加/更新知识原子)",
+      "subdir": "packages/plugins/wiki",
+      "env": [
+        "WIKI_DIR"
+      ]
+    },
     "word-count": {
       "name": "word-count",
       "version": "1.0.0",
