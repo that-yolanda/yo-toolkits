@@ -150,7 +150,6 @@ function checkStatus(v: unknown, ctx: Context): Status | null {
 // ── search ──
 function runSearch(ctx: Context, argv: string[]): void {
   const { opts, positional } = parseArgs(argv);
-  if (opts.help) { ctx.log.info(SEARCH_HELP); return; }
 
   const file = atomsPath(ctx);
   let atoms = readAtoms(file);
@@ -200,7 +199,6 @@ function runSearch(ctx: Context, argv: string[]): void {
 // ── add ──
 async function runAdd(ctx: Context, argv: string[]): Promise<void> {
   const { opts, positional } = parseArgs(argv);
-  if (opts.help) { ctx.log.info(ADD_HELP); return; }
 
   let input = positional[0];
   if (!input && !process.stdin.isTTY) input = await readStdin();
@@ -242,7 +240,6 @@ async function runAdd(ctx: Context, argv: string[]): Promise<void> {
 // ── update ──
 function runUpdate(ctx: Context, argv: string[]): void {
   const { opts, positional } = parseArgs(argv);
-  if (opts.help) { ctx.log.info(UPDATE_HELP); return; }
 
   const id = positional[0];
   if (!id) ctx.output.fail('INVALID_ARGS', '缺少记录 ID', 'yo wiki update <id> -s achieved');
@@ -271,60 +268,69 @@ function runUpdate(ctx: Context, argv: string[]): void {
   ctx.output.success({ id, changes, record: atoms[idx] }, `已更新 ${id} — ${changes.join(', ')}`);
 }
 
-// ── help 文本 ──
-const WIKI_HELP = `wiki — 本地知识库管理(搜索/添加/更新知识原子)
+// ── 帮助文本(cac 风格: Usage + Options)──
+function cmdDesc(s: string | undefined): string {
+  return s === 'search' ? '搜索知识库'
+    : s === 'add' ? '添加知识原子'
+    : s === 'update' ? '更新知识原子'
+    : '本地知识库管理(搜索/添加/更新知识原子)';
+}
 
-用法:
-  yo wiki search [关键词...] [选项]   搜索(关键词逗号 OR、多组 AND)
-  yo wiki add '<json>'                添加(参数或 stdin)
-  yo wiki update <id> [选项]          更新状态/类型/置信度/标签
+function formatHelp(sub: string | undefined): string {
+  const head = (usage: string) => `${cmdDesc(sub)}\n\nUsage:\n  $ ${usage}\n`;
+  if (sub === 'search') {
+    return head('yo wiki search [关键词...] [options]') + `
+关键词: 逗号分隔为 OR, 多个位置参数为 AND(匹配 knowledge/original/author/tags)
 
-输出:默认 json(机器可读),-f text 切彩色。
-配置:WIKI_DIR(知识库根),数据 $WIKI_DIR/原子库/atoms.jsonl
-子命令详细选项:yo wiki search -h | yo wiki add -h | yo wiki update -h`;
+Options:
+  -l, --limit <n>          返回数量(默认 20)
+  -b, --begin <date>       起始日期 YYYY-MM-DD
+  -e, --end <date>         结束日期 YYYY-MM-DD
+  -t, --type <list>        类型(逗号): ${TYPES.join('/')}
+  -s, --status <list>      状态(逗号): null/${STATUSES.join('/')}
+  -a, --author <list>      作者(逗号, 模糊)
+  -c, --confidence <list>  置信度(逗号): ${CONFIDENCES.join('/')}
+  -T, --tags <list>        标签(逗号)
+  -h, --help               显示本帮助`;
+  }
+  if (sub === 'add') {
+    return head("yo wiki add '<json>'   (或通过 stdin 传入)") + `
+必填字段:
+  knowledge               知识点陈述
+  type                    ${TYPES.join('/')}
+  confidence              ${CONFIDENCES.join('/')}
 
-const SEARCH_HELP = `wiki search — 搜索知识库
+可选字段:
+  status                  null/${STATUSES.join('/')}(默认 null)
+  author / original / url / date(默认今天) / tags[](默认 [])
 
-用法: yo wiki search [选项] [关键词...]
-关键词:逗号分隔为 OR,多个位置参数为 AND(匹配 knowledge/original/author/tags)
-
-选项:
-  -l, --limit <n>       返回数量(默认 20)
-  -b, --begin <date>    起始日期 YYYY-MM-DD
-  -e, --end <date>      结束日期 YYYY-MM-DD
-  -t, --type <list>     类型(逗号): ${TYPES.join('/')}
-  -s, --status <list>   状态(逗号): null/${STATUSES.join('/')}
-  -a, --author <list>   作者(逗号,模糊)
-  -c, --confidence <list> 置信度(逗号): ${CONFIDENCES.join('/')}
-  -T, --tags <list>     标签(逗号)
-
-示例:
-  yo wiki search 商业模式,定价
-  yo wiki search -t principle -c high 逻辑`;
-
-const ADD_HELP = `wiki add — 添加知识原子
-
-用法: yo wiki add '<json>'   (或通过 stdin 传入)
-必填: knowledge / type(${TYPES.join('/')}) / confidence(${CONFIDENCES.join('/')})
-可选: status(null/${STATUSES.join('/')}) / author / original / url / date / tags[]
-id 自动生成(YYYY-MM-NNN,当月自增)
-
-示例:
-  yo wiki add '{"knowledge":"...","type":"principle","confidence":"high","tags":["标签"]}'
-  echo '{...}' | yo wiki add`;
-
-const UPDATE_HELP = `wiki update — 更新知识原子
-
-用法: yo wiki update <id> [选项]   (至少一个)
-选项:
-  -s, --status <v>      null/${STATUSES.join('/')}
-  -t, --type <v>        ${TYPES.join('/')}
-  -c, --confidence <v>  ${CONFIDENCES.join('/')}
-  -T, --tags <list>     标签(逗号,覆盖)
+id 自动生成(YYYY-MM-NNN, 当月自增)
 
 示例:
-  yo wiki update 2026-06-001 -s achieved
-  yo wiki update 2026-06-003 -c high -T 定价,商业模式`;
+  yo wiki add '{"knowledge":"...","type":"principle","confidence":"high"}'`;
+  }
+  if (sub === 'update') {
+    return head('yo wiki update <id> [options]   (至少一个选项)') + `
+Options:
+  -s, --status <v>       null/${STATUSES.join('/')}
+  -t, --type <v>         ${TYPES.join('/')}
+  -c, --confidence <v>   ${CONFIDENCES.join('/')}
+  -T, --tags <list>      标签(逗号, 覆盖)
+  -h, --help             显示本帮助
+
+示例:
+  yo wiki update 2026-06-001 -s achieved`;
+  }
+  return head('yo wiki <command> [options]') + `
+Commands:
+  search [关键词...]  搜索知识库(逗号 OR、多组 AND)
+  add [json]          添加知识原子(参数或 stdin)
+  update <id>         更新原子字段
+
+各命令详细选项: yo wiki search -h | yo wiki add -h | yo wiki update -h
+输出: 默认 json(机器可读), -f text 切彩色
+配置: WIKI_DIR(知识库根), 数据 $WIKI_DIR/原子库/atoms.jsonl`;
+}
 
 const cmd = {
   name: 'wiki',
@@ -332,29 +338,33 @@ const cmd = {
   description: '本地知识库管理(搜索/添加/更新知识原子)',
   env: ['WIKI_DIR'],
   register(ctx: Context) {
-    // cac 不支持父子命令层级:注册单命令 + allowUnknownOptions,
-    // action 内从 process.argv 取原始子 argv,手动路由 search/add/update。
-    ctx.cli
+    // cac 不支持父子命令层级(多词命令名 'wiki search' 永远不等于 args[0] 'wiki',无法匹配):
+    // 用单命令 + allowUnknownOptions,action 内从 process.argv 取子 argv 手动路由。
+    // cac 的 -h 触发 command.outputHelp();覆写之,按子命令分发各自的 Usage + Options。
+    const wikiCmd = ctx.cli
       .command('wiki [...rest]', '本地知识库管理(搜索/添加/更新知识原子)')
-      .allowUnknownOptions()
-      .usage('yo wiki <search|add|update> [...]   (详: yo wiki)')
-      .action(() => {
-        const idx = process.argv.indexOf('wiki');
-        const argv = idx >= 0 ? process.argv.slice(idx + 1) : [];
-        const sub = argv[0];
-        const subArgv = argv.slice(1);
-        switch (sub) {
-          case 'search': return runSearch(ctx, subArgv);
-          case 'add': return runAdd(ctx, subArgv);
-          case 'update': return runUpdate(ctx, subArgv);
-          case undefined:
-          case '-h':
-          case '--help':
-            return ctx.log.info(WIKI_HELP);
-          default:
-            ctx.output.fail('INVALID_ARGS', `未知子命令: ${sub}`, '用法: yo wiki search|add|update');
-        }
-      });
+      .allowUnknownOptions();
+    (wikiCmd as { outputHelp: () => void }).outputHelp = () => {
+      const idx = process.argv.indexOf('wiki');
+      const sub = idx >= 0 ? process.argv[idx + 1] : undefined;
+      process.stdout.write(formatHelp(sub) + '\n');
+    };
+    wikiCmd.action(() => {
+      const idx = process.argv.indexOf('wiki');
+      const argv = idx >= 0 ? process.argv.slice(idx + 1) : [];
+      const sub = argv[0];
+      const subArgv = argv.slice(1);
+      switch (sub) {
+        case 'search': return runSearch(ctx, subArgv);
+        case 'add': return runAdd(ctx, subArgv);
+        case 'update': return runUpdate(ctx, subArgv);
+        case undefined: case '-h': case '--help':
+          process.stdout.write(formatHelp(undefined) + '\n');
+          return;
+        default:
+          ctx.output.fail('INVALID_ARGS', `未知子命令: ${sub}`, '用法: yo wiki search|add|update');
+      }
+    });
   },
 } satisfies Command;
 
