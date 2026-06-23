@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Command, Context } from '@that-yolanda/yo-toolkits';
+import { renderHelp } from '@that-yolanda/yo-toolkits';
+import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 interface CountResult {
   source: string;
@@ -42,12 +43,12 @@ interface Input {
 }
 
 /** 从参数解析待统计文本(缺参时 fail 退出) */
-function gatherInput(options: { file?: string; text?: string }, ctx: Context): Input {
+function gatherInput(options: { input?: string; text?: string }, ctx: Context): Input {
   if (options.text !== undefined) {
     return { text: options.text, source: options.text, encoding: 'input-string' };
   }
-  if (options.file) {
-    const absFile = path.resolve(ctx.cwd, options.file);
+  if (options.input) {
+    const absFile = path.resolve(ctx.cwd, options.input);
     if (!fs.existsSync(absFile)) {
       ctx.output.fail('FILE_NOT_FOUND', `文件不存在: ${absFile}`);
     }
@@ -56,22 +57,30 @@ function gatherInput(options: { file?: string; text?: string }, ctx: Context): I
   }
   ctx.output.fail(
     'INVALID_ARGS',
-    '请指定 -f <file> 或 -t <text>',
+    '请指定 -i <file> 或 -t <text>',
     '示例: yo word-count -t "你好 world"',
   );
 }
+
+const wordCountSpec: HelpSpec = {
+  description: '中英文字数统计',
+  usage: 'word-count -i <path> | -t <string>',
+  options: [
+    { flags: '-i, --input <path>', desc: '按文件统计' },
+    { flags: '-t, --text <string>', desc: '按字符串统计' },
+  ],
+};
 
 const cmd = {
   name: 'word-count',
   version: '1.0.0',
   description: '中英文字数统计',
   register(ctx: Context) {
-    ctx.cli
+    const c = ctx.cli
       .command(cmd.name, cmd.description)
-      .usage('word-count -f <path> | -t <string>')
-      .option('-f, --file <path>', '按文件统计')
+      .option('-i, --input <path>', '按文件统计')
       .option('-t, --text <string>', '按字符串统计')
-      .action((options: { file?: string; text?: string }) => {
+      .action((options: { input?: string; text?: string }) => {
         const { text, source, encoding } = gatherInput(options, ctx);
         const { chinese, english } = countText(text);
         const result: CountResult = {
@@ -94,6 +103,9 @@ const cmd = {
         console.log(`英文单词数:${result.english}`);
         console.log(`合计字数:${result.total}`);
       });
+    (c as { outputHelp: () => void }).outputHelp = () => {
+      process.stdout.write(renderHelp(wordCountSpec) + '\n');
+    };
   },
 } satisfies Command;
 

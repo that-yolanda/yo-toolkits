@@ -28,3 +28,7 @@ export {
 } from './registry.js';
 export { fetchSubdir } from './fetch.js';
 export type { FetchOptions } from './fetch.js';
+
+// 统一帮助渲染
+export { renderHelp, COMMON_OPTIONS } from './help.js';
+export type { HelpSpec, HelpOption, HelpCommand, HelpEnv } from './help.js';

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import type { Command, Context } from '@that-yolanda/yo-toolkits';
+import { renderHelp } from '@that-yolanda/yo-toolkits';
+import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 interface QualityConfig {
   fps: number;
@@ -22,15 +23,24 @@ const QUALITY: Record<string, QualityConfig> = {
 // 带透明通道的像素格式前缀,需先合成白底
 const TRANSPARENT_PREFIXES = ['yuva', 'gbrap', 'rgba', 'argb', 'pal8'];
 
+const gifSpec: HelpSpec = {
+  description: '视频转 GIF 动图',
+  usage: 'gif -i <file>',
+  options: [
+    { flags: '-i, --input <file>', desc: '输入视频文件路径(必填)' },
+    { flags: '-o, --output <file>', desc: '输出 GIF 路径(默认与输入同目录同名)' },
+    { flags: '-q, --quality <level>', desc: '清晰度 h/m/l(默认 h)' },
+  ],
+};
+
 const cmd = {
   name: 'gif',
   version: '1.0.0',
   description: '视频转 GIF 动图',
   deps: ['ffmpeg', 'ffprobe'],
   register(ctx: Context) {
-    ctx.cli
+    const c = ctx.cli
       .command(cmd.name, cmd.description)
-      .usage('gif -i <file>')
       .option('-i, --input <file>', '输入视频文件路径(必填)')
       .option('-o, --output <file>', '输出 GIF 路径(默认与输入同目录同名)')
       .option('-q, --quality <level>', '清晰度 h/m/l(默认 h)', { default: 'h' })
@@ -138,6 +148,9 @@ const cmd = {
           );
         },
       );
+    (c as { outputHelp: () => void }).outputHelp = () => {
+      process.stdout.write(renderHelp(gifSpec) + '\n');
+    };
   },
 } satisfies Command;
 

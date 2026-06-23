@@ -32,7 +32,15 @@ packages/
 每个插件 `default export` 一个 `Command`。**用 `const cmd = {...}; export default cmd` 写法**,register 内复用 `cmd.name` / `cmd.description` / `cmd.deps`,保证字段只写一次:
 
 ```ts
-import type { Command, Context } from '@that-yolanda/yo-toolkits';
+import { renderHelp } from '@that-yolanda/yo-toolkits';
+import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
+
+const myCmdSpec: HelpSpec = {
+  description: '一句话描述',
+  usage: 'my-cmd -i <file>',
+  options: [{ flags: '-i, --input <file>', desc: '输入' }],
+  env: [{ name: 'MY_CMD_KEY', desc: '某服务的访问密钥' }],
+};
 
 const cmd = {
   name: 'my-cmd',
@@ -41,15 +49,17 @@ const cmd = {
   deps: ['ffmpeg'],            // 外部系统依赖(可选);同时进 registry.json 的 deps
   env: ['MY_CMD_KEY'],         // 所需环境变量(可选);进 registry.json 的 env
   register(ctx: Context) {
-    ctx.cli
+    const c = ctx.cli
       .command(cmd.name, cmd.description)   // 复用,不再写第二遍
-      .usage('my-cmd -i <file>')            // cac 原生 .usage() 设 Usage 行
       .option('-i, --input <file>', '输入')
       .action(async (opts) => {
         ctx.spawn.assertDeps(cmd.deps);     // 复用声明的依赖
         const r = await ctx.spawn.run('ffmpeg', [...]);
         ctx.output.success({ result: r.stdout }, '完成');
       });
+    // 覆写 outputHelp,用框架 renderHelp 统一渲染(见"帮助规范")
+    (c as { outputHelp: () => void }).outputHelp = () =>
+      process.stdout.write(renderHelp(myCmdSpec) + '\n');
   },
 } satisfies Command;
 
@@ -79,6 +89,22 @@ export default cmd;
 - 默认 `json`(机器可读 `{ ok, data, error }`),`-f text` 切彩色人类可读
 - **不要**在插件里 `console.log` 业务结果,统一走 `ctx.output` / `ctx.log`,否则两种 format 会不一致
 - 进度信息用 `ctx.log`(走 stderr),避免污染 json 模式的 stdout
+
+### 帮助规范
+
+所有插件覆写 `command.outputHelp = () => renderHelp(spec)`,统一帮助格式(框架自动追加通用 `-f`/`-h`):
+
+```ts
+const spec: HelpSpec = {
+  description: '...',              // 必须,help 首行
+  usage: 'cmd -i <file>',          // 必须,不含 bin 前缀(自动加 $ yo)
+  options?: HelpOption[],          // 可选,业务选项
+  commands?: HelpCommand[],        // 可选,有子命令时(如 wiki)
+  env?: HelpEnv[],                 // 可选,依赖的环境变量
+};
+```
+
+> cac 的命令匹配只比对 `args[0]`(单字),多词命令名(如 `wiki search`)无法匹配,且 `.usage()` 会叠加 bin 名 → `yo yo wiki`。所以**不要**用 cac 的 `.usage()` 或多词子命令;有子命令时注册单命令 + `allowUnknownOptions` + action 内手动路由(见 `packages/plugins/wiki`)。业务选项短名**避开 `-f`**(全局 format 占用,会被 bootstrap 拦截)。
 
 ## 加载与分发机制
 

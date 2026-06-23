@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Command, Context } from '@that-yolanda/yo-toolkits';
+import { renderHelp } from '@that-yolanda/yo-toolkits';
+import type { Command, Context, HelpSpec } from '@that-yolanda/yo-toolkits';
 
 // ── 枚举与类型 ──
 type AtomType = 'principle' | 'method' | 'case' | 'anti-pattern' | 'tool' | 'insight';
@@ -198,7 +199,7 @@ function runSearch(ctx: Context, argv: string[]): void {
 
 // ── add ──
 async function runAdd(ctx: Context, argv: string[]): Promise<void> {
-  const { opts, positional } = parseArgs(argv);
+  const { positional } = parseArgs(argv);
 
   let input = positional[0];
   if (!input && !process.stdin.isTTY) input = await readStdin();
@@ -268,68 +269,68 @@ function runUpdate(ctx: Context, argv: string[]): void {
   ctx.output.success({ id, changes, record: atoms[idx] }, `已更新 ${id} — ${changes.join(', ')}`);
 }
 
-// ── 帮助文本(cac 风格: Usage + Options)──
-function cmdDesc(s: string | undefined): string {
-  return s === 'search' ? '搜索知识库'
-    : s === 'add' ? '添加知识原子'
-    : s === 'update' ? '更新知识原子'
-    : '本地知识库管理(搜索/添加/更新知识原子)';
-}
+// ── 帮助:统一用框架 renderHelp 渲染(description/Usage/Commands/Options/ENV + 通用 -f/-h)──
+const WIKI_ENV = [{ name: 'WIKI_DIR', desc: '知识库根目录(数据 $WIKI_DIR/原子库/atoms.jsonl)' }];
+
+const wikiSpec: HelpSpec = {
+  description: '本地知识库管理(搜索/添加/更新知识原子)',
+  usage: 'wiki <command> [options]',
+  commands: [
+    { name: 'search [关键词...]', desc: '搜索知识库(逗号 OR、多组 AND)' },
+    { name: 'add [json]', desc: '添加知识原子(参数或 stdin)' },
+    { name: 'update <id>', desc: '更新原子字段' },
+  ],
+  env: WIKI_ENV,
+};
+
+const searchSpec: HelpSpec = {
+  description: '搜索知识库',
+  usage: 'wiki search [关键词...] [options]',
+  options: [
+    { flags: '-l, --limit <n>', desc: '返回数量(默认 20)' },
+    { flags: '-b, --begin <date>', desc: '起始日期 YYYY-MM-DD' },
+    { flags: '-e, --end <date>', desc: '结束日期 YYYY-MM-DD' },
+    { flags: '-t, --type <list>', desc: `类型(逗号): ${TYPES.join('/')}` },
+    { flags: '-s, --status <list>', desc: `状态(逗号): null/${STATUSES.join('/')}` },
+    { flags: '-a, --author <list>', desc: '作者(逗号, 模糊)' },
+    { flags: '-c, --confidence <list>', desc: `置信度(逗号): ${CONFIDENCES.join('/')}` },
+    { flags: '-T, --tags <list>', desc: '标签(逗号)' },
+  ],
+  env: WIKI_ENV,
+};
+
+const addSpec: HelpSpec = {
+  description: '添加知识原子',
+  usage: "wiki add '<json>'   (或 stdin)",
+  options: [
+    { flags: 'knowledge', desc: '知识点陈述(必填)' },
+    { flags: 'type', desc: `${TYPES.join('/')} (必填)` },
+    { flags: 'confidence', desc: `${CONFIDENCES.join('/')} (必填)` },
+    { flags: 'status', desc: `null/${STATUSES.join('/')} (默认 null)` },
+    { flags: 'author/original/url/date/tags', desc: '可选;id 自动生成(YYYY-MM-NNN)' },
+  ],
+  env: WIKI_ENV,
+};
+
+const updateSpec: HelpSpec = {
+  description: '更新知识原子',
+  usage: 'wiki update <id> [options]   (至少一个)',
+  options: [
+    { flags: '-s, --status <v>', desc: `null/${STATUSES.join('/')}` },
+    { flags: '-t, --type <v>', desc: TYPES.join('/') },
+    { flags: '-c, --confidence <v>', desc: CONFIDENCES.join('/') },
+    { flags: '-T, --tags <list>', desc: '标签(逗号, 覆盖)' },
+  ],
+  env: WIKI_ENV,
+};
 
 function formatHelp(sub: string | undefined): string {
-  const head = (usage: string) => `${cmdDesc(sub)}\n\nUsage:\n  $ ${usage}\n`;
-  if (sub === 'search') {
-    return head('yo wiki search [关键词...] [options]') + `
-关键词: 逗号分隔为 OR, 多个位置参数为 AND(匹配 knowledge/original/author/tags)
-
-Options:
-  -l, --limit <n>          返回数量(默认 20)
-  -b, --begin <date>       起始日期 YYYY-MM-DD
-  -e, --end <date>         结束日期 YYYY-MM-DD
-  -t, --type <list>        类型(逗号): ${TYPES.join('/')}
-  -s, --status <list>      状态(逗号): null/${STATUSES.join('/')}
-  -a, --author <list>      作者(逗号, 模糊)
-  -c, --confidence <list>  置信度(逗号): ${CONFIDENCES.join('/')}
-  -T, --tags <list>        标签(逗号)
-  -h, --help               显示本帮助`;
-  }
-  if (sub === 'add') {
-    return head("yo wiki add '<json>'   (或通过 stdin 传入)") + `
-必填字段:
-  knowledge               知识点陈述
-  type                    ${TYPES.join('/')}
-  confidence              ${CONFIDENCES.join('/')}
-
-可选字段:
-  status                  null/${STATUSES.join('/')}(默认 null)
-  author / original / url / date(默认今天) / tags[](默认 [])
-
-id 自动生成(YYYY-MM-NNN, 当月自增)
-
-示例:
-  yo wiki add '{"knowledge":"...","type":"principle","confidence":"high"}'`;
-  }
-  if (sub === 'update') {
-    return head('yo wiki update <id> [options]   (至少一个选项)') + `
-Options:
-  -s, --status <v>       null/${STATUSES.join('/')}
-  -t, --type <v>         ${TYPES.join('/')}
-  -c, --confidence <v>   ${CONFIDENCES.join('/')}
-  -T, --tags <list>      标签(逗号, 覆盖)
-  -h, --help             显示本帮助
-
-示例:
-  yo wiki update 2026-06-001 -s achieved`;
-  }
-  return head('yo wiki <command> [options]') + `
-Commands:
-  search [关键词...]  搜索知识库(逗号 OR、多组 AND)
-  add [json]          添加知识原子(参数或 stdin)
-  update <id>         更新原子字段
-
-各命令详细选项: yo wiki search -h | yo wiki add -h | yo wiki update -h
-输出: 默认 json(机器可读), -f text 切彩色
-配置: WIKI_DIR(知识库根), 数据 $WIKI_DIR/原子库/atoms.jsonl`;
+  return renderHelp(
+    sub === 'search' ? searchSpec
+      : sub === 'add' ? addSpec
+      : sub === 'update' ? updateSpec
+      : wikiSpec,
+  );
 }
 
 const cmd = {
