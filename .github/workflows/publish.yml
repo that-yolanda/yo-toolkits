@@ -32,7 +32,8 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
       # npm trusted publishing(OIDC)需要 npm >= 11.5.1,node 22 自带 npm 10,需升级
