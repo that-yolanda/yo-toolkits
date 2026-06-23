@@ -1,5 +1,3 @@
-import path from 'node:path';
-import os from 'node:os';
 import type { Context } from '../core/index.js';
 import { fetchRemoteRegistry, fetchSubdir, addLocal } from '../core/index.js';
 import { installDeps } from '../install.js';
@@ -19,7 +17,7 @@ export function registerAdd(ctx: Context): void {
         );
       }
 
-      const dest = path.join(os.homedir(), '.yo', 'store', name);
+      const dest = ctx.store.dataDir(name);
       ctx.log.info(`从 GitHub 拉取 ${registry.repo}/${entry.subdir} ...`);
       await fetchSubdir(registry.repo, entry.subdir, dest, { force: true });
 

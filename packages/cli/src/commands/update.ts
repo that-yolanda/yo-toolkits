@@ -1,5 +1,3 @@
-import path from 'node:path';
-import os from 'node:os';
 import type { Context } from '../core/index.js';
 import { listLocal, fetchRemoteRegistry, fetchSubdir, addLocal } from '../core/index.js';
 import { installDeps } from '../install.js';
@@ -27,7 +25,7 @@ export function registerUpdate(ctx: Context): void {
           ctx.log.warn(`${p.name}: registry 中已不存在,跳过`);
           continue;
         }
-        const dest = path.join(os.homedir(), '.yo', 'store', p.name);
+        const dest = ctx.store.dataDir(p.name);
         ctx.log.info(`更新 ${p.name}...`);
         await fetchSubdir(registry.repo, entry.subdir, dest, { force: true });
         await installDeps(ctx.spawn, dest);

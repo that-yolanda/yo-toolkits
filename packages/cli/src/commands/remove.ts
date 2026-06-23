@@ -1,5 +1,3 @@
-import path from 'node:path';
-import os from 'node:os';
 import fs from 'node:fs';
 import type { Context } from '../core/index.js';
 import { removeLocal } from '../core/index.js';
@@ -9,7 +7,7 @@ export function registerRemove(ctx: Context): void {
     .command('remove <name>', '删除本地已安装的插件命令')
     .alias('rm')
     .action((name: string) => {
-      const dest = path.join(os.homedir(), '.yo', 'store', name);
+      const dest = ctx.store.dataDir(name);
       const removed = removeLocal(name);
       let removedFiles = false;
       if (fs.existsSync(dest)) {

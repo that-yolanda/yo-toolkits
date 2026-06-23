@@ -1,6 +1,6 @@
 {
   "name": "@that-yolanda/yo-toolkits",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "description": "个人 CLI 工具集合 — 插件式 (bin: yo + 框架运行时)",
   "repository": {
