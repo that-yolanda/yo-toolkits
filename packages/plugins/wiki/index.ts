@@ -185,15 +185,17 @@ function runSearch(ctx: Context, argv: string[]): void {
   }
   ctx.log.info(`搜索结果(${results.length} 条)`);
   if (results.length === 0) { ctx.log.warn('无匹配'); return; }
+  const out: string[] = [];
   for (const a of results) {
-    console.log('---');
-    console.log(`${a.id}  ${a.type}  ${a.confidence}  ${a.status ?? '-'}  ${a.author ? '@' + a.author : ''}`);
-    console.log(a.tags.length ? a.tags.map((t) => '#' + t).join(' ') : '-');
-    console.log(a.knowledge);
-    console.log(a.original ? `[原文] ${a.original.slice(0, 150)}${a.original.length > 150 ? '...' : ''}` : '[原文] -');
-    console.log(a.url ? `[链接] ${a.url}` : '[链接] -');
-    console.log(a.date);
+    out.push('---');
+    out.push(`${a.id}  ${a.type}  ${a.confidence}  ${a.status ?? '-'}  ${a.author ? '@' + a.author : ''}`);
+    out.push(a.tags.length ? a.tags.map((t) => '#' + t).join(' ') : '-');
+    out.push(a.knowledge);
+    out.push(a.original ? `[原文] ${a.original.slice(0, 150)}${a.original.length > 150 ? '...' : ''}` : '[原文] -');
+    out.push(a.url ? `[链接] ${a.url}` : '[链接] -');
+    out.push(a.date);
   }
+  process.stdout.write(out.join('\n') + '\n');
 }
 
 // ── add ──

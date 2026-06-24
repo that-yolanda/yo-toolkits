@@ -1,9 +1,9 @@
 {
-  "name": "yo-toolkits-monorepo",
+  "name": "yo-toolkits",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "个人 CLI 工具集合 — 插件式 monorepo",
+  "description": "本地常用 CLI 工具集合",
   "scripts": {
     "dev": "tsx packages/cli/src/bin.ts",
     "build": "pnpm -r run build",

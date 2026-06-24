@@ -14,7 +14,7 @@ export interface Command {
   description: string;
   /** 外部系统依赖(如 ffmpeg / rg);生成 registry.json 的 deps,运行时由 ctx.spawn.assertDeps 检查 */
   deps?: string[];
-  /** 所需环境变量 / 配置项(如 WIKI_DIR);生成 registry.json 的 env,供 config.env.example 参考 */
+  /** 所需环境变量 / 配置项(如 WIKI_DIR);生成 registry.json 的 env,供 .env.example 参考 */
   env?: string[];
   register(ctx: Context): void | Promise<void>;
 }
@@ -78,9 +78,9 @@ export interface Spawner {
 }
 
 export interface Config {
-  /** 读取:优先 process.env(兼容旧脚本 WIKI_DIR 等),再 ~/.yo/config.json */
+  /** 读取:优先 process.env(shell source 已导出),再 $YO_CONFIG_HOME/config.env */
   get(key: string, fallback?: string): string | undefined;
-  /** 写入 ~/.yo/config.json */
+  /** 写入 $YO_CONFIG_HOME/config.env */
   set(key: string, value: string): void;
 }
 

@@ -110,7 +110,7 @@ const spec: HelpSpec = {
 
 ## 加载与分发机制
 
-> **统一根**:所有 yo 数据(`config.json` / `store` / `registry.local.json` / `tmp`)归口于 `~/.local/share/yo`(Windows `%LOCALAPPDATA%\yo`),与 yolanda-skills 的 `YO_CONFIG_HOME` 默认值一致。下文 `<root>` 即指此目录。macOS/Linux 读 `XDG_DATA_HOME` 覆盖。
+> **统一根**:所有 yo 数据(`config.env` / `store` / `registry.local.json` / `tmp`)归口于 `~/.local/share/yo`(Windows `%LOCALAPPDATA%\yo`),与 yolanda-skills 的 `YO_CONFIG_HOME` 默认值一致。下文 `<root>` 即指此目录。读取优先级:`YO_CONFIG_HOME` > `XDG_DATA_HOME` > 默认。
 
 ### 加载(loader)
 

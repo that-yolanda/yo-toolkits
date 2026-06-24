@@ -110,6 +110,25 @@ export async function bootstrap(argv: string[]): Promise<void> {
   } catch (err) {
     handleError(err, ctx);
   }
+
+  // cac 对未匹配命令静默返回,此处兜底处理
+  const matched = ctx.cli.matchedCommand;
+  if (!matched) {
+    const isHelp = cleanedArgv.length === 0
+      || cleanedArgv[0] === '-h'
+      || cleanedArgv[0] === '--help';
+    if (isHelp) {
+      // 无参数或 -h:输出全局帮助
+      ctx.cli.outputHelp();
+      process.exit(0);
+    }
+    // 无效命令:报错
+    ctx.output.fail(
+      'UNKNOWN_COMMAND',
+      `未知命令: ${cleanedArgv[0] || '(空)'}`,
+      '使用 yo --help 查看可用命令',
+    );
+  }
 }
 
 function handleError(err: unknown, ctx: Context): never {

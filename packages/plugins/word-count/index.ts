@@ -95,12 +95,13 @@ const cmd = {
           return;
         }
         ctx.log.info('统计结果');
-        console.log('------------------------');
-        console.log(`来源:${result.source}`);
-        if (result.encoding) console.log(`编码:${result.encoding}`);
-        console.log(`中文汉字数:${result.chinese}`);
-        console.log(`英文单词数:${result.english}`);
-        console.log(`合计字数:${result.total}`);
+        const lines = ['------------------------'];
+        lines.push(`来源:${result.source}`);
+        if (result.encoding) lines.push(`编码:${result.encoding}`);
+        lines.push(`中文汉字数:${result.chinese}`);
+        lines.push(`英文单词数:${result.english}`);
+        lines.push(`合计字数:${result.total}`);
+        process.stdout.write(lines.join('\n') + '\n');
       });
     (c as { outputHelp: () => void }).outputHelp = () => {
       process.stdout.write(ctx.renderHelp(wordCountSpec) + '\n');
