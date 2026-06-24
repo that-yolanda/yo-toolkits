@@ -111,21 +111,20 @@ export async function bootstrap(argv: string[]): Promise<void> {
     handleError(err, ctx);
   }
 
-  // cac 对未匹配命令静默返回,此处兜底处理
-  const matched = ctx.cli.matchedCommand;
-  if (!matched) {
-    const isHelp = cleanedArgv.length === 0
-      || cleanedArgv[0] === '-h'
-      || cleanedArgv[0] === '--help';
-    if (isHelp) {
-      // 无参数或 -h:输出全局帮助
-      ctx.cli.outputHelp();
-      process.exit(0);
-    }
-    // 无效命令:报错
+  // cac 对未匹配命令静默返回(仅在有前导 node/script 路径时执行 action)。
+  // 用 registered command names 来判断:没有任何已知命令名命中 → 未知命令或空参数。
+  const known = new Set(ctx.cli.commands.map((c) => c.name));
+  const userArgs = cleanedArgv.filter((a) => !a.startsWith('/') && a !== process.execPath && a !== process.argv[1]);
+  const hasKnown = userArgs.some((a) => known.has(a));
+  const hasHelp = userArgs.some((a) => a === '-h' || a === '--help');
+  if (userArgs.length === 0) {
+    ctx.cli.outputHelp();
+    process.exit(0);
+  }
+  if (!hasKnown && !hasHelp) {
     ctx.output.fail(
       'UNKNOWN_COMMAND',
-      `未知命令: ${cleanedArgv[0] || '(空)'}`,
+      `未知命令: ${userArgs[0]}`,
       '使用 yo --help 查看可用命令',
     );
   }
