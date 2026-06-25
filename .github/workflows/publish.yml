@@ -16,7 +16,9 @@ on:
       - 'package.json'
       - 'tsconfig.base.json'
       - 'pnpm-workspace.yaml'
-      - 'pnpm-lock.yaml'
+      # 不含 pnpm-lock.yaml: monorepo 单一 lockfile,插件加依赖也会改它,
+      # 会误触发 cli 发布(version 未 bump 时 npm publish 必失败);
+      # cli 依赖变化已由 packages/cli/** (含其 package.json) 覆盖。
 
 permissions:
   contents: read
