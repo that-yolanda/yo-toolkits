@@ -2,6 +2,19 @@
   "version": "1.0.0",
   "repo": "that-yolanda/yo-toolkits",
   "plugins": {
+    "asr": {
+      "name": "asr",
+      "version": "1.1.0",
+      "description": "音视频转字幕(ffmpeg + sherpa-onnx Qwen3-ASR)",
+      "subdir": "packages/plugins/asr",
+      "deps": [
+        "ffmpeg"
+      ],
+      "env": [
+        "ASR_MODEL",
+        "ASR_VAD"
+      ]
+    },
     "gif": {
       "name": "gif",
       "version": "1.0.0",
